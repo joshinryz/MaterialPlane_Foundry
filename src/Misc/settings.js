@@ -20,7 +20,7 @@ export const registerSettings = function() {
      */
     game.settings.register(MODULE.moduleName,'Enable', {
         name: "MaterialPlane.Sett.En",
-        scope: "world",
+        scope: "client",
         config: true,
         default: true,
         type: Boolean,

@@ -1,5 +1,25 @@
 # Changelog Material Plane Foundry Module
 
+### v2.1.1pre- 15-11-2021
+<b>Pre-release</b>
+
+Fixes:
+<ul>
+    <li>Foundry will now connnect to Material Server if the Foundry server is secured (for example, when using the Forge)</li>
+</ul>
+
+Other:
+<ul>
+    <li>Changed 'Calibration Menu' to 'Sensor Configuration'</li>
+    <li>Made 'Enable module' setting functional. It prevents that client from trying to connect to the sensor</li>
+</ul>
+
+Compatible with:
+<ul>
+    <li><b>Sensor firmware: </b>v2.1.2</li>
+    <li><b>Material Server: </b>v1.0.3</li>
+</ul>
+
 ### v2.1.0 - 12-10-2021
 <b>Updating the sensor firmware to v2.1.0 is required</b>
 Additions:

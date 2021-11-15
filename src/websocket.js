@@ -82,7 +82,33 @@ async function analyzeWSmessage(msg,passthrough = false){
     else if (data.status == 'serialConnected') {
         ui.notifications.info(`Material Plane: ${game.i18n.localize("MaterialPlane.Notifications.ConnectedMSS")}: ${data.port}`);
     }
+    else if (data.status == 'IRcode') {
+        console.log("IR code received",data.data.protocol,data.data.code);
+        if (data.data.protocol == 'NEC' && data.data.code == 1261762567) game.togglePause(true,true);
+        else if (data.data.protocol == 'NEC' && data.data.code == 1261754407) game.togglePause(false,true);
+        else if (data.data.protocol == 'NEC' && data.data.code == 1261699837) controlToken(0); //up
+        else if (data.data.protocol == 'NEC' && data.data.code == 1261732477) controlToken(1); //down
+        else if (data.data.protocol == 'NEC' && data.data.code == 1261716157) controlToken(2); //right
+        else if (data.data.protocol == 'NEC' && data.data.code == 1261748797) controlToken(3); //left
+        //canvas.tokens.controlled[0].document.update({x:
+        
+    }
+    
 };
+
+function controlToken(dir) {
+    let token = canvas.tokens.controlled[0];
+    let x = token.x;
+    let y = token.y;
+    let gridSize = canvas.scene.data.grid;
+
+    if (dir == 0) y -= gridSize;
+    else if (dir == 1) y += gridSize;
+    else if (dir == 2) x += gridSize;
+    else if (dir == 3) x -= gridSize;
+
+    token.document.update({x:x, y:y});
+}
 
 /**
  * Start a new websocket
