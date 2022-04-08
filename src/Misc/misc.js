@@ -136,6 +136,7 @@ export class MaterialPlaneLayer extends CanvasLayer {
       const dx =  Math.abs(coordsCenter.x - coords.x);
       const dy = Math.abs(coordsCenter.y - coords.y);
       const distance = Math.sqrt( dx*dx + dy*dy );
+      console.log('distance',coords,distance)
       if (distance < minDistance) {
           closestToken = token;  
           minDistance = distance;

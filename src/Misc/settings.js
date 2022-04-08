@@ -27,6 +27,34 @@ export const registerSettings = function() {
     });
 
     /**
+     * Select device
+     */
+     game.settings.register(MODULE.moduleName,'device', {
+        name: "MaterialPlane.Sett.Device",
+        hint: "MaterialPlane.Sett.Device_Hint",
+        scope: "world",
+        config: true,
+        default: 0,
+        type: String,
+        choices: ["MaterialPlane.Sett.Device_Sensor", "MaterialPlane.Sett.Device_Touch"],
+        onChange: x => window.location.reload()
+    });
+
+    /**
+     * Touch timeout
+     */
+    game.settings.register(MODULE.moduleName, 'touchTimeout', {
+        name: "MaterialPlane.Sett.TouchTimeout",
+        hint: "MaterialPlane.Sett.TouchTimeout_Hint",
+        default: 1000,
+        type: Number,
+        scope: 'world',
+        range: { min: 500, max: 5000, step: 100 },
+        config: true
+        
+    });
+
+    /**
      * Sets the movement method
      */
     game.settings.register(MODULE.moduleName,'movementMethod', {
@@ -38,6 +66,7 @@ export const registerSettings = function() {
         default:1,
         choices:["MaterialPlane.Sett.MovementMethod_Default","MaterialPlane.Sett.MovementMethod_Live","MaterialPlane.Sett.MovementMethod_SbS"]
     });
+
 
     /**
      * Release the token after dropping

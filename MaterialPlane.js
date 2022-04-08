@@ -11,6 +11,7 @@ import { registerLayer } from "./src/Misc/misc.js";
 import { baseSetup } from "./src/IRtoken/baseSetup.js";
 import { initializeIRtokens, initializeCursors, setLastBaseAddress } from "./src/analyzeIR.js";
 import { remoteSetup, IRremote } from "./src/IRremote/IRremote.js";
+import { analyzeTouch } from "./src/analyzeTouch.js";
 
 export const moduleName = "MaterialPlane";
 export let lastToken;
@@ -94,7 +95,13 @@ Hooks.on('ready', ()=>{
         return;
     }
     if ((enableModule || game.user.isGM) && game.settings.get(moduleName,'Enable')){
-        startWebsocket();
+        if (game.settings.get(moduleName,'device') == 'MaterialPlane.Sett.Device_Sensor')
+            startWebsocket();
+        else {
+            document.addEventListener('touchstart',function(e) {analyzeTouch('start',e.touches);});
+            document.addEventListener('touchmove',function(e) {analyzeTouch('move',e.touches);});
+            document.addEventListener('touchend',function(e) {analyzeTouch('end',e.touches);});
+        }
 
         if (hideElements){
             $('#logo').hide();
@@ -105,7 +112,6 @@ Hooks.on('ready', ()=>{
             $('#hotbar').hide();
             checkKeys();
         }
-
     }
 
     game.socket.on(`module.MaterialPlane`, (payload) =>{

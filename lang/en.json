@@ -27,6 +27,12 @@
     "MaterialPlane.Sett.BETA": "Beta Kit",
     "MaterialPlane.Sett.MenuSize": "Pen Menu Size",
     "MaterialPlane.Sett.MenuSizeHint": "(Beta HW only) Set the size of the Material Plane Pen Menu. Relative to the grid size",
+    "MaterialPlane.Sett.Device": "Device",
+    "MaterialPlane.Sett.Device_Hint": "Select which device is used to detect mini movement",
+    "MaterialPlane.Sett.Device_Sensor": "Material Plane Sensor",
+    "MaterialPlane.Sett.Device_Touch": "Touch Frame",
+    "MaterialPlane.Sett.TouchTimeout": "Touch Timeout",
+    "MaterialPlane.Sett.TouchTimeout_Hint": "(Touch frame only) Time in milliseconds after which a token is dropped if no touch is detected",
     
     "MaterialPlane.BaseSetup.BtnName": "Base Setup",
     "MaterialPlane.BaseSetup.Title": "Base Setup",

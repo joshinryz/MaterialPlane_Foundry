@@ -32,9 +32,10 @@ export class IRtoken {
                 this.token = undefined;
                 return false;
             }
-            this.currentPosition = {x:this.token.x+canvas.scene.data.grid/2, y:this.token.y+canvas.scene.data.grid/2}
-            this.previousPosition = this.currentPosition;
+            //this.currentPosition = {x:this.token.x+canvas.scene.data.grid/2, y:this.token.y+canvas.scene.data.grid/2}
+            //this.previousPosition = this.currentPosition;
             this.controlledToken = this.token;
+            
         }
         if (this.token.can(game.user,"control"))  this.token.control({releaseOthers:false});
         this.moveToken(scaledCoords);
@@ -96,27 +97,28 @@ export class IRtoken {
                     if (moveX && moveY) {
                         this.token.data.x = coords.x;
                         this.token.data.y = coords.y;
-                        this.currentPosition = currentPos;
+                        //this.currentPosition = currentPos;
                     }
                     //movement in X is allowed, Y is not
                     else if (!surroundingGridCollisions[0] && !surroundingGridCollisions[1]) {
                         this.token.data.x = coords.x;
                         this.token.data.y = currentPos.y - Math.floor(canvas.dimensions.size/2);
-                        this.currentPosition = currentPos;
+                        //this.currentPosition = currentPos;
                     }
                     //movement in Y is allowed, X is not
                     else if (!surroundingGridCollisions[2] && !surroundingGridCollisions[3]) {
                         this.token.data.x = currentPos.x - Math.floor(canvas.dimensions.size/2);
                         this.token.data.y = coords.y;
-                        this.currentPosition = currentPos;
+                        
                     }
+                    this.currentPosition = currentPos;
                 }
                 else {
                     this.token.data.x = coords.x;
                     this.token.data.y = coords.y;
                     this.currentPosition = currentPos;
                 }
-
+                
                 this.token.refresh();
                 if (movementMethod == 1) this.token.updateSource({noUpdateFog: false});
             }
@@ -195,10 +197,10 @@ export class IRtoken {
      * Calculate the difference between the old coordinates of the token and the last measured coordinates, and move the token there
      */
     async dropIRtoken(release = game.settings.get(moduleName,'deselect')){
-
+        
         //If no token is controlled, return
         if (this.token == undefined) return;
-
+        
         //this.moveToken(this.currentPosition)
 
         let newCoords = {
@@ -209,7 +211,7 @@ export class IRtoken {
         this.previousPosition = this.currentPosition;
         
         this.moveToken(this.currentPosition);
-        
+
         //Release token, if setting is enabled
         if (release) this.token.release();
 
