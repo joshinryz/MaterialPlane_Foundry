@@ -32,8 +32,8 @@ export class IRtoken {
                 this.token = undefined;
                 return false;
             }
-            //this.currentPosition = {x:this.token.x+canvas.scene.data.grid/2, y:this.token.y+canvas.scene.data.grid/2}
-            //this.previousPosition = this.currentPosition;
+            this.currentPosition = {x:this.token.x+canvas.scene.data.grid/2, y:this.token.y+canvas.scene.data.grid/2}
+            this.previousPosition = this.currentPosition;
             this.controlledToken = this.token;
             
         }

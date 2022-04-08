@@ -22,7 +22,7 @@ export function analyzeTouch(type,touchData) {
 }
 
 async function moveToken(tokenNr,coordinates) {
-    await IRtokens[tokenNr].update(coordinates,scaleTouchInput(coordinates),true);
+    await IRtokens[tokenNr].update(coordinates,scaleTouchInput(coordinates));
 }
 
 function dropToken(tokenNr=0) {
