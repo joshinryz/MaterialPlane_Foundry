@@ -199,7 +199,7 @@ export class IRtoken {
     async dropIRtoken(release = game.settings.get(moduleName,'deselect')){
         
         //If no token is controlled, return
-        if (this.token == undefined) return;
+        if (this.token == undefined) return false;
         
         //this.moveToken(this.currentPosition)
 
@@ -217,11 +217,17 @@ export class IRtoken {
 
         //Get the coordinates of the center of the grid closest to the coords
         if (game.settings.get(moduleName,'movementMethod') != 2) {
-            await this.token.document.update(newCoords);
+            if (this.token.can(game.user,"control")) {
+                await this.token.document.update(newCoords);
+            }
+            else {
+                this.requestMovement(this.token,newCoords);
+            }
         }
         
         this.token = undefined;
         this.marker.hide();
+        return true;
     }
 
     requestMovement(token,coords){

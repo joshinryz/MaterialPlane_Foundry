@@ -123,27 +123,24 @@ export class MaterialPlaneLayer extends CanvasLayer {
      * @return {*} Token closest to the coordinates
      */
  export function findToken(coords){
-        
-  //Get the gridsize in on-screen pixels
-  let gridsize = canvas.scene.data.grid*canvas.scene._viewPosition.scale;
 
   //For all tokens on the canvas: get the distance between the token and the coordinate. Get the closest token. If the distance is smaller than the hitbox of the token, 'token' is returned
   let closestToken = undefined;
   let minDistance = 1000;
   
-  for (let token of canvas.tokens.children[0].children){
+  for (let token of canvas.tokens.placeables){
       let coordsCenter = token.getCenter(token.x,token.y); 
       const dx =  Math.abs(coordsCenter.x - coords.x);
       const dy = Math.abs(coordsCenter.y - coords.y);
       const distance = Math.sqrt( dx*dx + dy*dy );
-      console.log('distance',coords,distance)
+   
       if (distance < minDistance) {
           closestToken = token;  
           minDistance = distance;
       }
   }
-  
-  if (minDistance < canvas.scene.data.grid*1) return closestToken;      
+
+  if (minDistance < canvas.scene.data.grid) return closestToken;      
   else return undefined;
 } 
 

@@ -95,12 +95,13 @@ Hooks.on('ready', ()=>{
         return;
     }
     if ((enableModule || game.user.isGM) && game.settings.get(moduleName,'Enable')){
-        if (game.settings.get(moduleName,'device') == 'MaterialPlane.Sett.Device_Sensor')
+        if (game.settings.get(moduleName,'device') == 0)
             startWebsocket();
         else {
-            document.addEventListener('touchstart',function(e) {analyzeTouch('start',e.touches);});
-            document.addEventListener('touchmove',function(e) {analyzeTouch('move',e.touches);});
-            document.addEventListener('touchend',function(e) {analyzeTouch('end',e.touches);});
+            document.addEventListener('touchstart',function(e) {analyzeTouch('start',e);});
+            document.addEventListener('touchmove',function(e) {analyzeTouch('move',e);});
+            document.addEventListener('touchend',function(e) {analyzeTouch('end',e);});
+            document.addEventListener('touchcancel',function(e) {analyzeTouch('end',e);});
         }
 
         if (hideElements){
@@ -119,13 +120,8 @@ Hooks.on('ready', ()=>{
         
         if (game.user.id == payload.receiverId) {
             if (payload.msgType == "moveToken"){
-                let token = canvas.tokens.children[0].children;
-                for (let i=0; i<token.length; i++) {
-                    if (token[i].id == payload.tokenId){
-                        let tokenSel = token[i];
-                        tokenSel.update({x: payload.newCoords.x, y: payload.newCoords.y});
-                    }
-                }
+                let token = canvas.tokens.get(payload.tokenId);
+                if (token != undefined) token.document.update({x: payload.newCoords.x, y: payload.newCoords.y});
             }
         }
         if (game.user.isGM) {
@@ -166,6 +162,7 @@ Hooks.on('ready', ()=>{
 Hooks.on("renderSidebarTab", (app, html) => {
     enableModule = (game.user.name == game.settings.get(moduleName,'TargetName')) ? true : false;
     if (enableModule == false && game.user.isGM == false) return;
+    if (game.settings.get(moduleName,'device') == 1) return;
     
     //Create labels and buttons in sidebar
     if (app.options.id == 'settings') {
