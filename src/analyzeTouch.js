@@ -51,8 +51,11 @@ function scaleTouchInput(coords) {
 }
 
 function genericTouch(type,coordinates,scaledCoordinates) {
-    let element = document.elementFromPoint(scaledCoordinates.x,scaledCoordinates.y);
-    if (element == null && type == 'end') checkDoorClick(scaledCoordinates)
+    let element = document.elementFromPoint(coordinates.x,coordinates.y);
+    if (element.id == 'board') {
+        if (type == 'end') checkDoorClick(scaledCoordinates);
+        else canvas.tokens.releaseAll();
+    }
 }
 
 function checkDoorClick(data) {
