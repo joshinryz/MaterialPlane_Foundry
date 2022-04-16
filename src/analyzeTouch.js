@@ -1,6 +1,7 @@
 import { IRtokens } from "./analyzeIR.js";
 
-let timeout;
+let timeout = [];
+let tokenActive = [];
 
 export async function analyzeTouch(type,data) {
 
@@ -13,10 +14,11 @@ export async function analyzeTouch(type,data) {
         const coordinates = {x: touch.screenX, y: touch.screenY};
         const scaledCoordinates = scaleTouchInput(coordinates)
         const forceNew = type == 'start';
-
         if (type != 'end') {
-            if (timeout != undefined) clearTimeout(timeout);
-            timeout = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'));
+            if (type == 'start') tokenActive[id] = true;
+            else if (!tokenActive[id]) return;
+            if (timeout[id] != undefined) clearTimeout(timeout[id]);
+            timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
             const foundToken = await moveToken(id,coordinates,scaledCoordinates,forceNew);
             if (!foundToken) genericTouch(type,coordinates,scaledCoordinates);
         }
@@ -32,9 +34,10 @@ async function moveToken(tokenNr,coordinates,scaledCoordinates,forceNew) {
 }
 
 function dropToken(tokenNr=0) {
-    clearTimeout(timeout);
-    timeout = undefined;
+    clearTimeout(timeout[tokenNr]);
+    timeout[tokenNr] = undefined;
     IRtokens[tokenNr].dropIRtoken();
+    tokenActive[tokenNr] = false;
 }
 
 function scaleTouchInput(coords) {
