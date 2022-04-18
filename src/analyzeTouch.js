@@ -17,7 +17,7 @@ export async function analyzeTouch(type,data) {
         const scaledCoordinates = scaleTouchInput(coordinates)
         const forceNew = type == 'start';
         const tapMode = game.settings.get('MaterialPlane','tapMode');
-
+   
         if (tapMode == 0) {             //Tap disabled
             if (type == 'end')
                 dropToken(id);
@@ -87,9 +87,11 @@ export async function analyzeTouch(type,data) {
                             const dx =  Math.abs(raiseData[i].scaledCoordinates.x - scaledCoordinates.x);
                             const dy = Math.abs(raiseData[i].scaledCoordinates.y - scaledCoordinates.y);
                             const distance = Math.sqrt( dx*dx + dy*dy );
-                            if (distance < canvas.scene.data.grid)
+                            if (distance < canvas.scene.data.grid) {
                                 raiseDetected = true;
-                            break;
+                                raiseData.splice(i,1);
+                                break;
+                            }
                         }
                     }
                 }
