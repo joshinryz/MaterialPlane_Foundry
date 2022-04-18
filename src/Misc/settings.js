@@ -40,6 +40,16 @@ export const registerSettings = function() {
         onChange: x => window.location.reload()
     });
 
+    game.settings.register(MODULE.moduleName,'tapMode', {
+        name: "Tap Mode",
+        hint: "Sets the tap mode",
+        scope: "world",
+        config: true,
+        default: 0,
+        type: String,
+        choices: ["Disable", "Tap Timeout", "Raise Mini"]
+    });
+
     /**
      * Touch timeout
      */
@@ -50,6 +60,18 @@ export const registerSettings = function() {
         type: Number,
         scope: 'world',
         range: { min: 500, max: 5000, step: 100 },
+        config: true
+        
+    });
+
+    game.settings.register(MODULE.moduleName, 'tapTimeout', {
+        name: "Tap Timeout",
+        hint: `(Touch frame only) Tap Mode: Tap Timeout => Sets the timeout (in ms) to detect a tap. Any touch shorter than this will be considered a tap.
+        Tap Mode: Raise Mini => Sets the timeout (in ms) to detect a mini raise. If a touch end is detected in the viscinity of a touch start within this timeout, it will consider the touch to be from a mini, otherwise it'll be considered a tap.`,
+        default: 500,
+        type: Number,
+        scope: 'world',
+        range: { min: 100, max: 5000, step: 100 },
         config: true
         
     });

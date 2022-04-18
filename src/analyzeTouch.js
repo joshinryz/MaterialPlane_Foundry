@@ -2,6 +2,8 @@ import { IRtokens } from "./analyzeIR.js";
 
 let timeout = [];
 let tokenActive = [];
+let tapTimeout = [];
+let raiseData = [];
 
 export async function analyzeTouch(type,data) {
 
@@ -14,30 +16,113 @@ export async function analyzeTouch(type,data) {
         const coordinates = {x: touch.screenX, y: touch.screenY};
         const scaledCoordinates = scaleTouchInput(coordinates)
         const forceNew = type == 'start';
-        if (type != 'end') {
-            if (type == 'start') tokenActive[id] = true;
-            else if (!tokenActive[id]) return;
-            if (timeout[id] != undefined) clearTimeout(timeout[id]);
-            timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
-            const foundToken = await moveToken(id,coordinates,scaledCoordinates,forceNew);
-            if (!foundToken) genericTouch(type,coordinates,scaledCoordinates);
+        const tapMode = game.settings.get('MaterialPlane','tapMode');
+
+        if (tapMode == 0) {             //Tap disabled
+            if (type == 'end')
+                dropToken(id);
+            else {
+                if (type == 'start') tokenActive[id] = true;
+                else if (!tokenActive[id]) return;
+                if (timeout[id] != undefined) clearTimeout(timeout[id]);
+                timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                await moveToken(id,coordinates,scaledCoordinates,forceNew);
+            }    
         }
-        else {
-            const foundToken = dropToken(id);
-            if (!foundToken) genericTouch(type,coordinates,scaledCoordinates);
+        else if (tapMode == 1) {        //Tap Timeout
+            if (type == 'end') {
+                clearTimeout(tapTimeout[id]);
+                if (!tokenActive[id]) 
+                    genericTouch(type,coordinates,scaledCoordinates);
+                else
+                    tokenActive[id] = false;
+            }
+            else if (type == 'start')
+                tapTimeout[id] = setTimeout(tapDetect,game.settings.get('MaterialPlane','tapTimeout'),{id,coordinates,scaledCoordinates,forceNew}); 
+            else if (tokenActive[id]) {
+                if (timeout[id] != undefined) clearTimeout(timeout[id]);
+                timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                await moveToken(id,coordinates,scaledCoordinates,forceNew);
+            }
+
+        }
+        else if (tapMode == 2) {        //Raise Mini
+            if (type == 'end') {
+                if (!tokenActive[id]) genericTouch(type,coordinates,scaledCoordinates);
+                else {
+                    clearTimeout(tapTimeout[id]);
+                    dropToken(id);
+                    raiseData.push({
+                        id,
+                        coordinates,
+                        scaledCoordinates,
+                        time: Date.now()
+                    });
+                    tokenActive[id] = false;
+                }      
+            }
+            else if (type != 'start' && tokenActive[id]) {
+                if (timeout[id] != undefined) clearTimeout(timeout[id]);
+                timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                await moveToken(id,coordinates,scaledCoordinates,forceNew);
+            }
+            else if (type == 'start') {
+                const currentTime = Date.now();
+                let raiseDetected = false;
+                for (let i=raiseData.length; i>=0; i--) {
+                    if (raiseData[i] == undefined) {
+                        raiseDetected = true;
+                        continue;
+                    }
+                    const elapsedTime = currentTime-raiseData[i].time;
+                    if (elapsedTime >= game.settings.get('MaterialPlane','tapTimeout')) {
+                        raiseData.splice(i,1);
+                    }
+                    else {
+                        const dx =  Math.abs(raiseData[i].scaledCoordinates.x - scaledCoordinates.x);
+                        const dy = Math.abs(raiseData[i].scaledCoordinates.y - scaledCoordinates.y);
+                        const distance = Math.sqrt( dx*dx + dy*dy );
+                        if (distance < canvas.scene.data.grid)
+                            raiseDetected = true;
+                        break;
+                    }
+                }
+                if (raiseDetected) {
+                    if (type == 'start') tokenActive[id] = true;
+                    if (tokenActive[id]) {
+                        if (timeout[id] != undefined) clearTimeout(timeout[id]);
+                        timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                        raiseDetected = await moveToken(id,coordinates,scaledCoordinates,forceNew);
+                    }
+                    else
+                        raiseDetected = false;
+                    
+                }
+                if (!raiseDetected) {
+                    genericTouch(type,coordinates,scaledCoordinates);
+                    tokenActive[id] = false;
+                }
+                    
+            }
+            
         }
     }
 }
 
-async function moveToken(tokenNr,coordinates,scaledCoordinates,forceNew) {
-    return await IRtokens[tokenNr].update(coordinates,scaledCoordinates,forceNew);
+async function tapDetect(data) {
+    tokenActive[data.id] = true; 
+    await moveToken(data.id,data.coordinates,data.scaledCoordinates,data.forceNew);
 }
 
-function dropToken(tokenNr=0) {
-    clearTimeout(timeout[tokenNr]);
-    timeout[tokenNr] = undefined;
-    IRtokens[tokenNr].dropIRtoken();
-    tokenActive[tokenNr] = false;
+async function moveToken(id,coordinates,scaledCoordinates,forceNew) {
+    return await IRtokens[id].update(coordinates,scaledCoordinates,forceNew);
+}
+
+function dropToken(id=0) {
+    clearTimeout(timeout[id]);
+    timeout[id] = undefined;
+    IRtokens[id].dropIRtoken();
+    tokenActive[id] = false;
 }
 
 function scaleTouchInput(coords) {
