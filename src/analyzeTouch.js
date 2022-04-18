@@ -49,7 +49,7 @@ export async function analyzeTouch(type,data) {
         else if (tapMode == 2) {        //Raise Mini
             if (type == 'end') {
                 if (!tokenActive[id]) genericTouch(type,coordinates,scaledCoordinates);
-                else {
+                //else {
                     clearTimeout(tapTimeout[id]);
                     dropToken(id);
                     raiseData.push({
@@ -59,7 +59,7 @@ export async function analyzeTouch(type,data) {
                         time: Date.now()
                     });
                     tokenActive[id] = false;
-                }      
+                //}      
             }
             else if (type != 'start' && tokenActive[id]) {
                 if (timeout[id] != undefined) clearTimeout(timeout[id]);
@@ -69,24 +69,31 @@ export async function analyzeTouch(type,data) {
             else if (type == 'start') {
                 const currentTime = Date.now();
                 let raiseDetected = false;
-                for (let i=raiseData.length; i>=0; i--) {
-                    if (raiseData[i] == undefined) {
-                        raiseDetected = true;
-                        continue;
-                    }
-                    const elapsedTime = currentTime-raiseData[i].time;
-                    if (elapsedTime >= game.settings.get('MaterialPlane','tapTimeout')) {
-                        raiseData.splice(i,1);
-                    }
-                    else {
-                        const dx =  Math.abs(raiseData[i].scaledCoordinates.x - scaledCoordinates.x);
-                        const dy = Math.abs(raiseData[i].scaledCoordinates.y - scaledCoordinates.y);
-                        const distance = Math.sqrt( dx*dx + dy*dy );
-                        if (distance < canvas.scene.data.grid)
-                            raiseDetected = true;
-                        break;
+                if (raiseData.length == 0) {
+                    raiseData.push({
+                        id,
+                        coordinates,
+                        scaledCoordinates,
+                        time: Date.now()
+                    });
+                }
+                else {
+                    for (let i=raiseData.length-1; i>=0; i--) {
+                        const elapsedTime = currentTime-raiseData[i].time;
+                        if (elapsedTime >= game.settings.get('MaterialPlane','tapTimeout')) {
+                            raiseData.splice(i,1);
+                        }
+                        else {
+                            const dx =  Math.abs(raiseData[i].scaledCoordinates.x - scaledCoordinates.x);
+                            const dy = Math.abs(raiseData[i].scaledCoordinates.y - scaledCoordinates.y);
+                            const distance = Math.sqrt( dx*dx + dy*dy );
+                            if (distance < canvas.scene.data.grid)
+                                raiseDetected = true;
+                            break;
+                        }
                     }
                 }
+                
                 if (raiseDetected) {
                     if (type == 'start') tokenActive[id] = true;
                     if (tokenActive[id]) {
