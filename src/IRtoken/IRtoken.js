@@ -27,7 +27,8 @@ export class IRtoken {
             //Find the nearest token to the scaled coordinates
             if (this.token == undefined) this.token = findToken( scaledCoords );
             
-            if (this.token == undefined) return false;
+            if (this.token == undefined) 
+                return false;
             if (this.token.can(game.user,"control") == false && game.settings.get(moduleName,'EnNonOwned') == false) {
                 this.token = undefined;
                 return false;
@@ -37,7 +38,9 @@ export class IRtoken {
             this.controlledToken = this.token;
             
         }
-        if (this.token.can(game.user,"control"))  this.token.control({releaseOthers:false});
+        if (this.token.can(game.user,"control"))
+            this.token.control({releaseOthers:false});
+        
         this.moveToken(scaledCoords);
 
         if (game.settings.get(moduleName,'movementMarker') && this.marker != undefined && this.token != undefined) this.marker.show();

@@ -4,20 +4,31 @@ let timeout = [];
 let tokenActive = [];
 let tapTimeout = [];
 let raiseData = [];
+let touches = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
 
 export async function analyzeTouch(type,data) {
 
     if (game.paused) return;
 
     const changedTouches = data.changedTouches;
-
+    
     for (let touch of changedTouches) {
-        const id = touch.identifier;
+        let id = touches.findIndex(t => t == touch.identifier);
+        if (id == -1) {
+            id = touches.findIndex(t => t == -1);
+            touches[id] = touch.identifier;
+        }
+
+        if (type == 'end') {
+            touches[id] = -1;
+        }
+
         const coordinates = {x: touch.screenX, y: touch.screenY};
         const scaledCoordinates = scaleTouchInput(coordinates)
         const forceNew = type == 'start';
         const tapMode = game.settings.get('MaterialPlane','tapMode');
-   
+        
+        
         if (tapMode == 0) {             //Tap disabled
             if (type == 'end')
                 dropToken(id);

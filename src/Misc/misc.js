@@ -140,8 +140,10 @@ export class MaterialPlaneLayer extends CanvasLayer {
       }
   }
 
-  if (minDistance < canvas.scene.data.grid) return closestToken;      
-  else return undefined;
+  if (minDistance < canvas.scene.data.grid) 
+    return closestToken;      
+  else 
+    return undefined;
 } 
 
 
