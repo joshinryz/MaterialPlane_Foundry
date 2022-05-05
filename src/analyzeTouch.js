@@ -5,10 +5,18 @@ let tokenActive = [];
 let tapTimeout = [];
 let raiseData = [];
 let touches = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+let pauseTimeoutCheck = false;
 
 export async function analyzeTouch(type,data) {
 
-    if (game.paused) return;
+    if (game.paused) {
+        if (!pauseTimeoutCheck) {
+            ui.notifications.warn("Material Plane: "+game.i18n.localize("GAME.PausedWarning"));
+            pauseTimeoutCheck = true;
+            setTimeout(function(){pauseTimeoutCheck = false},1000)
+        }
+        return;
+    }
 
     const changedTouches = data.changedTouches;
     

@@ -69,24 +69,6 @@ export function registerLayer() {
             }
         })
     }
-
-    /*
-  CONFIG.Canvas.layers = foundry.utils.mergeObject(CONFIG.Canvas.layers, {
-    materialPlane: MaterialPlaneLayer
-  });
-
-  // overriding other modules if needed
-  if (!Object.is(Canvas.layers, CONFIG.Canvas.layers)) {
-    console.error('Possible incomplete layer injection by other module detected!')
-
-    const layers = Canvas.layers
-    Object.defineProperty(Canvas, 'layers', {
-      get: function () {
-        return foundry.utils.mergeObject(layers, CONFIG.Canvas.layers)
-      }
-    })
-  }
-  */
 }
 
 export class MaterialPlaneLayer extends CanvasLayer {
@@ -122,30 +104,33 @@ export class MaterialPlaneLayer extends CanvasLayer {
      * @param {*} position Coordinates
      * @return {*} Token closest to the coordinates
      */
- export function findToken(coords){
+ export function findToken(coords, spacing=canvas.scene.data.grid, currentToken){
 
   //For all tokens on the canvas: get the distance between the token and the coordinate. Get the closest token. If the distance is smaller than the hitbox of the token, 'token' is returned
   let closestToken = undefined;
   let minDistance = 1000;
   
   for (let token of canvas.tokens.placeables){
-      let coordsCenter = token.getCenter(token.x,token.y); 
-      const dx =  Math.abs(coordsCenter.x - coords.x);
-      const dy = Math.abs(coordsCenter.y - coords.y);
-      const distance = Math.sqrt( dx*dx + dy*dy );
-   
-      if (distance < minDistance) {
-          closestToken = token;  
-          minDistance = distance;
-      }
+    if (currentToken == token) continue;
+    if (!token.can(game.user,"control")) {
+      if (!game.settings.get(moduleName,'EnNonOwned') || !token.visible) continue;
+    }
+    let coordsCenter = token.getCenter(token.x,token.y); 
+    const dx =  Math.abs(coordsCenter.x - coords.x);
+    const dy = Math.abs(coordsCenter.y - coords.y);
+    const distance = Math.sqrt( dx*dx + dy*dy );
+  
+    if (distance < minDistance) {
+        closestToken = token;  
+        minDistance = distance;
+    }
   }
 
-  if (minDistance < canvas.scene.data.grid) 
+  if (minDistance < spacing) 
     return closestToken;      
   else 
     return undefined;
 } 
-
 
 /*
  * tokenMarker draws a rectangle at the target position for the token

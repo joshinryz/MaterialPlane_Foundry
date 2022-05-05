@@ -127,6 +127,18 @@ export const registerSettings = function() {
     });
 
     /**
+     * Sets if the target client is allowed to move non-owned tokens
+     */
+     game.settings.register(MODULE.moduleName,'collisionPrevention', {
+        name: "MaterialPlane.Sett.CollisionPrevention",
+        hint: "MaterialPlane.Sett.CollisionPrevention_Hint",
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean
+    });
+
+    /**
      * Hides all elements on the target client, if that client is not a GM
      */
     game.settings.register(MODULE.moduleName,'HideElements', {

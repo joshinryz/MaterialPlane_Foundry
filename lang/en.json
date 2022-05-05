@@ -33,6 +33,8 @@
     "MaterialPlane.Sett.Device_Touch": "Touch Frame",
     "MaterialPlane.Sett.TouchTimeout": "Touch Timeout",
     "MaterialPlane.Sett.TouchTimeout_Hint": "(Touch frame only) Time in milliseconds after which a token is dropped if no touch is detected",
+    "MaterialPlane.Sett.CollisionPrevention": "Token Collision Prevention",
+    "MaterialPlane.Sett.CollisionPrevention_Hint": "(Experimental) When enabled, Material Plane will try to prevent two tokens from colliding by placing the moving token onto the nearest empty grid space in its movement path",
     
     "MaterialPlane.BaseSetup.BtnName": "Base Setup",
     "MaterialPlane.BaseSetup.Title": "Base Setup",
@@ -89,6 +91,7 @@
     "MaterialPlane.Notifications.ConnectFail": "Can't connect, retrying",
     "MaterialPlane.Notifications.SSL": "Your Foundry server is secured, you will need to use Material Server to connect to the sensor",
     "MaterialPlane.Notifications.AutoExposureDone": "Auto exposure done",
+    "MaterialPlane.Notifications.SpaceOccupied": "Space already occupied. Moving token to nearest empty space along its travel path.",
 
     "MaterialPlane.CalDialog.Singlepoint1": "Single-point calibration",
     "MaterialPlane.CalDialog.Singlepoint2": "Please calibrate each corner of you screen.",

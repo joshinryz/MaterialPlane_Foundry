@@ -1,5 +1,18 @@
 # Changelog Material Plane Foundry Module
-### v2.1.3 - 26-01-2021
+### v2.1.3_t7 - 05-05-2022
+Fixes:
+<ul>
+    <li>Invisible non-owned tokens can no longer be moved, even if 'Non-Owned Movement' is enabled</li>
+    <li>If 'Non-Owned Movement' is disabled, non-owned tokens no longer take priority over owned tokens when searching for the nearest token</li>
+</ul>
+
+Additions:
+<ul>
+    <li>Added support for touch screens</li>
+    <li>Added an experimental token collision detection to prevent a moving token from ending up on a space already occupied by another token. Can be enabled in the module settings.</li>
+</ul>
+
+### v2.1.3 - 26-01-2022
 Fixes:
 <ul>
     <li>Fixed X and Y Offset in 'Sensor Configuration'</li>
