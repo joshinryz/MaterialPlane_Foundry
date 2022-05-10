@@ -1,6 +1,29 @@
 
 import { moduleName, hwFirmware, msVersion } from "../../MaterialPlane.js";
 
+let debugSettings = {
+  wsRaw: false,
+  ws: false,
+  touchDetect: false,
+  tapDetect: false,
+  nearestToken: false,
+  updateMovement: false,
+  moveToken: false,
+  dropToken: false
+};
+
+export function configureDebug(data) {
+  for (const [key,value] of Object.entries(data)) {
+    debugSettings[key] = value;
+  }
+  console.log(`MP Debug - Configured to`,debugSettings)
+}
+
+export function debug(type, message) {
+  if (debugSettings?.[type]) console.log(`MP Debug - ${type} - `, message)
+}
+
+
 export function compatibleCore(compatibleVersion){
   let coreVersion = game.version == undefined ? game.data.version : `0.${game.version}`;
   coreVersion = coreVersion.split(".");
@@ -125,6 +148,8 @@ export class MaterialPlaneLayer extends CanvasLayer {
         minDistance = distance;
     }
   }
+
+  debug('nearestToken',`Token: ${closestToken.name}, Position: (${closestToken.x}, ${closestToken.y}), Distance: ${minDistance}, Min Distance: ${spacing}, Control: ${minDistance<spacing}`)
 
   if (minDistance < spacing) 
     return closestToken;      

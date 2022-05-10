@@ -7,7 +7,7 @@
 import { registerSettings } from "./src/Misc/settings.js";
 import { sendWS,startWebsocket } from "./src/websocket.js";
 import { calibrationForm, calibrationProgressScreen, removeOverlay } from "./src/calibration.js";
-import { registerLayer } from "./src/Misc/misc.js";
+import { registerLayer, debug, configureDebug } from "./src/Misc/misc.js";
 import { baseSetup } from "./src/IRtoken/baseSetup.js";
 import { initializeIRtokens, initializeCursors, setLastBaseAddress } from "./src/analyzeIR.js";
 import { remoteSetup, IRremote } from "./src/IRremote/IRremote.js";
@@ -285,4 +285,8 @@ Hooks.on('controlToken', (token,controlled) => {
         document.getElementById("MP_lastTokenActorName").value=token.actor.name;
         document.getElementById("MP_lastTokenSceneName").value=canvas.scene.name;
     }
+})
+
+Hooks.on('MPdebug', (data) => {
+    configureDebug(data);
 })

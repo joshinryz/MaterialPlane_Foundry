@@ -1,5 +1,6 @@
 import { moduleName,calibrationDialog,calibrationProgress,hwVariant,setHwVariant, setHwFirmware, irRemote } from "../MaterialPlane.js";
 import { analyzeIR } from "./analyzeIR.js";
+import { debug } from "./Misc/misc.js";
 
 //Websocket variables
 let ip = "materialserver.local:3000";       //Ip address of the websocket server
@@ -14,9 +15,11 @@ let wsInterval;                 //Interval timer to detect disconnections
  */
 async function analyzeWSmessage(msg,passthrough = false){
     //console.log('raw',msg);
+    debug('wsRaw',msg);
     let data;
     try {
         data = JSON.parse(msg);
+        debug('ws',data);
         //console.log('data',data);
     }
     catch (error) {

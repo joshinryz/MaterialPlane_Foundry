@@ -1,5 +1,5 @@
 import { moduleName } from "../../MaterialPlane.js";
-import { findToken, tokenMarker } from "../Misc/misc.js";
+import { debug, findToken, tokenMarker } from "../Misc/misc.js";
 
 export class IRtoken {
     constructor() { 
@@ -27,10 +27,14 @@ export class IRtoken {
             //Find the nearest token to the scaled coordinates
             if (this.token == undefined) this.token = findToken( scaledCoords );
             
-            if (this.token == undefined) 
+            if (this.token == undefined) {
+                debug('updateMovement','No token found')
                 return false;
+            }
+                
             if (this.token.can(game.user,"control") == false && game.settings.get(moduleName,'EnNonOwned') == false) {
                 this.token = undefined;
+                debug('updateMovement',`User can't control token ${this.token.name}`)
                 return false;
             }
             this.currentPosition = {x:this.token.x+canvas.scene.data.grid/2, y:this.token.y+canvas.scene.data.grid/2}
@@ -124,7 +128,10 @@ export class IRtoken {
                 
                 this.token.refresh();
                 if (movementMethod == 1) this.token.updateSource({noUpdateFog: false});
+                debug('moveToken',`Token: ${this.token.name}, Move to: (${coords.x}, ${coords.y})`)
             }
+            else
+                debug('moveToken',`Token: ${this.token.name}, Can't move due to a wall collision`)
         }
         //Step-by-Step movement: when dragging the token, the token is moved every gridspace
         else if (movementMethod == 2) {
@@ -138,7 +145,10 @@ export class IRtoken {
                 this.previousPosition = this.currentPosition;
 
                 await this.token.document.update(newCoords);
+                debug('moveToken',`Token: ${this.token.name}, Move to: (${newCoords.x}, ${newCoords.y})`)
             }
+            else
+                debug('moveToken',`Token: ${this.token.name}, Can't move due to a wall collision`)
         }
 
         //Draw the movement marker
@@ -292,9 +302,11 @@ export class IRtoken {
         if (game.settings.get(moduleName,'movementMethod') != 2) {
             if (this.token.can(game.user,"control")) {
                 await this.token.document.update(newCoords);
+                debug('dropToken',`Token ${this.token.name}, Dropping at (${newCoords.x}, ${newCoords.y})`)
             }
             else {
                 this.requestMovement(this.token,newCoords);
+                debug('dropToken',`Token ${this.token.name}, Non-owned token, requesting GM client to be dropped at (${newCoords.x}, ${newCoords.y})`)
             }
         }
         

@@ -1,4 +1,5 @@
 import { IRtokens } from "./analyzeIR.js";
+import { debug } from "./Misc/misc.js";
 
 let timeout = [];
 let tokenActive = [];
@@ -8,6 +9,8 @@ let touches = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
 let pauseTimeoutCheck = false;
 
 export async function analyzeTouch(type,data) {
+    //console.log('data',data)
+    //debug('touchDetect',{type,data});
 
     if (game.paused) {
         if (!pauseTimeoutCheck) {
@@ -32,7 +35,8 @@ export async function analyzeTouch(type,data) {
         }
 
         const coordinates = {x: touch.screenX, y: touch.screenY};
-        const scaledCoordinates = scaleTouchInput(coordinates)
+        const scaledCoordinates = scaleTouchInput(coordinates);
+        debug('touchDetect', `${type}, id: ${id}, Coordinates: (${coordinates.x}, ${coordinates.y}), Scaled: (${scaledCoordinates.x}, ${scaledCoordinates.y})`);
         const forceNew = type == 'start';
         const tapMode = game.settings.get('MaterialPlane','tapMode');
         
@@ -44,7 +48,7 @@ export async function analyzeTouch(type,data) {
                 if (type == 'start') tokenActive[id] = true;
                 else if (!tokenActive[id]) return;
                 if (timeout[id] != undefined) clearTimeout(timeout[id]);
-                timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                timeout[id] = setTimeout(touchTimeout,game.settings.get('MaterialPlane','touchTimeout'),id);
                 await moveToken(id,coordinates,scaledCoordinates,forceNew);
             }    
         }
@@ -60,7 +64,7 @@ export async function analyzeTouch(type,data) {
                 tapTimeout[id] = setTimeout(tapDetect,game.settings.get('MaterialPlane','tapTimeout'),{id,coordinates,scaledCoordinates,forceNew}); 
             else if (tokenActive[id]) {
                 if (timeout[id] != undefined) clearTimeout(timeout[id]);
-                timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                timeout[id] = setTimeout(touchTimeout,game.settings.get('MaterialPlane','touchTimeout'),id);
                 await moveToken(id,coordinates,scaledCoordinates,forceNew);
             }
 
@@ -82,7 +86,7 @@ export async function analyzeTouch(type,data) {
             }
             else if (type != 'start' && tokenActive[id]) {
                 if (timeout[id] != undefined) clearTimeout(timeout[id]);
-                timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                timeout[id] = setTimeout(touchTimeout,game.settings.get('MaterialPlane','touchTimeout'),id);
                 await moveToken(id,coordinates,scaledCoordinates,forceNew);
             }
             else if (type == 'start') {
@@ -119,7 +123,7 @@ export async function analyzeTouch(type,data) {
                     if (type == 'start') tokenActive[id] = true;
                     if (tokenActive[id]) {
                         if (timeout[id] != undefined) clearTimeout(timeout[id]);
-                        timeout[id] = setTimeout(dropToken,game.settings.get('MaterialPlane','touchTimeout'),id);
+                        timeout[id] = setTimeout(touchTimeout,game.settings.get('MaterialPlane','touchTimeout'),id);
                         raiseDetected = await moveToken(id,coordinates,scaledCoordinates,forceNew);
                     }
                     else
@@ -138,12 +142,18 @@ export async function analyzeTouch(type,data) {
 }
 
 async function tapDetect(data) {
+    debug('tapDetect','Tap Timeout passed, allowing token movement')
     tokenActive[data.id] = true; 
     await moveToken(data.id,data.coordinates,data.scaledCoordinates,data.forceNew);
 }
 
 async function moveToken(id,coordinates,scaledCoordinates,forceNew) {
     return await IRtokens[id].update(coordinates,scaledCoordinates,forceNew);
+}
+
+function touchTimeout(id) {
+    debug('dropToken','Touch timeout passed, dropping token');
+    dropToken(id);
 }
 
 function dropToken(id=0) {
@@ -168,9 +178,18 @@ function scaleTouchInput(coords) {
 
 function genericTouch(type,coordinates,scaledCoordinates) {
     let element = document.elementFromPoint(coordinates.x,coordinates.y);
-    if (element.id == 'board') {
-        if (type == 'end') checkDoorClick(scaledCoordinates);
-        else canvas.tokens.releaseAll();
+    if (element == null) {
+        if (type == 'end') 
+        checkDoorClick(scaledCoordinates);
+    }
+    else if (element?.id == 'board') {
+        if (type == 'end') {
+            checkDoorClick(scaledCoordinates);
+        }
+        else {
+            canvas.tokens.releaseAll();
+            debug('tapDetect', `Tapped on canvas, releasing all tokens`)
+        }
     }
 }
 
@@ -179,7 +198,6 @@ function checkDoorClick(data) {
     for (let door of doors) {
         const position = door.doorControl.position;
         const hitArea = door.doorControl.hitArea;
-
         if (Math.abs(data.x - position.x - hitArea.width/2) <= hitArea.width/2 && Math.abs(data.y - position.y - hitArea.height/2) <= hitArea.height/2) {
             const event = {
                 data: {
@@ -189,6 +207,7 @@ function checkDoorClick(data) {
                 },
                 stopPropagation: event => {return;}
             }
+            debug('tapDetect', `Door tapped`)
             door.doorControl._onMouseDown(event);
         }
     }
